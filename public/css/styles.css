@@ -1,0 +1,74 @@
+body {
+  font-family: helvetica;
+  color: #000000;
+}
+
+a {
+  text-decoration: none;
+}
+
+.clear {
+  clear: both;
+}
+
+.spinner {
+  position: absolute;
+  padding-top: 400px;
+  width: 100%;
+  margin: 0px auto;
+}
+
+.toolbar {
+  padding: 5px;
+  border-bottom: 1px solid #DCDCDC;
+}
+
+.toolbar .authorize {
+  float: right;
+}
+
+.toolbar .buttons {
+  float: left;
+}
+
+.notes {
+  float: left;
+  width: 300px;
+  list-style-type: none;
+}
+.notes li {
+  font-size: 16px;
+  padding: 10px;
+  border-bottom: 1px solid #E5E5E5;
+  overflow: hidden;
+  cursor: pointer;
+}
+.notes li.selected {
+  color: #FFFFFF;
+  background: #08C;
+}
+
+.canvas {
+  float: left;
+  border-left: 1px solid #DCDCDC;
+}
+.canvas .welcome-message {
+  width: 400px;
+  text-align: center;
+  margin: 100px auto 0px auto;
+  font-size: 20px;
+  line-height: 25px; }
+.canvas .line {
+  width: 100%;
+  border-top: 1px solid #DCDCDC;
+  margin: 2px 0px; }
+.canvas input, .canvas textarea {
+  font-size: 15px;
+  color: #000000;
+  width: 99%;
+  border: none;
+  box-shadow: none;
+  padding: 2px 5px;
+  margin: 0px; }
+.canvas input:focus, .canvas textarea:focus {
+  outline: none; }

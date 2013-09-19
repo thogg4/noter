@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" type="text/css" media="screen" charset="utf-8">
+    <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen" charset="utf-8">
+
+    <script src='http://cdnjs.cloudflare.com/ajax/libs/spin.js/1.2.7/spin.min.js' type="text/javascript"></script>
+    <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js' type="text/javascript"></script>
+    <script src='https://www.dropbox.com/static/api/1/dropbox-datastores-0.1.0-b6.js' type="text/javascript"></script>
+    <script src='http://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.min.js' type="text/javascript"></script>
+    <script type="text/javascript" charset="utf-8">
+
+      var throwError = function(error) {
+        $('.errors').html(error)
+      }
+
+      var render = function(template, object) {
+        return Mustache.render(template, object) 
+      }
+  
+      var showSpinner = function() {
+        new Spinner({}).spin($('.spinner')[0])
+      }
+
+      var hideSpinner = function() {
+        $('.spinner').hide()
+      }
+
+      //notes
+
+      var noteTitle = "<li id='{{id}}'>{{title}}</li>"
+
+      var fullNote = "<input id='{{id}}' value='{{title}}' /><div class='line'></div><textarea id='{{id}}'>{{body}}</textarea>"
+
+      var noteObject = function(note) {
+        return {title: note.get('title'), body: note.get('body'), id: note.getId()}
+      }
+
+      var newNoteClickHandler = function() {
+        $('.new-note').on('click', function() {
+          var note = notes.insert({title: '', body: ''})
+          loadNote(note.getId())
+          return false
+        })
+      }
+
+      var removeNoteClickHandler = function(id) {
+        $('.remove-note').on('click', function() {
+          note = notes.get($('.canvas').find('input').attr('id'))
+          note.deleteRecord()
+          return false
+        })
+      }
+
+
+      var noteClickHandler = function() {
+        $('.notes').on('click', 'li', function() {
+          loadNote($(this).attr('id'))
+          return false
+        })
+      }
+
+      var noteTypeHandler = function() {
+        $('.canvas').on('keyup', 'input, textarea', function() {
+          var note = notes.get($(this).attr('id'))
+          var canvas = $(this).parent('.canvas')
+          note.update({title: canvas.find('input').val(), body: canvas.find('textarea').val()})
+        })
+      }
+
+      var loadNoteStore = function() {
+        var datastoreManager = client.getDatastoreManager()
+        datastoreManager.openDefaultDatastore(function(error, datastore) {
+          if (error) { throwError(error) }    
+          window.notes = datastore.getTable('notes')
+          loadNotes(notes.query())
+          hideSpinner()
+          changeListener(datastore)
+        })
+        noteClickHandler()
+      }
+
+      var loadNotes = function(notes) {
+        $.each(notes, function(i, note) {
+          $('.notes').append(render(noteTitle, noteObject(note)))
+        })
+      }
+
+      var loadNote = function(id) {
+        var note = notes.get(id)
+        $('.canvas').html(render(fullNote, noteObject(note))).find('textarea').css({height: window.textHeight})
+        $('.canvas input').focus()
+        noteTypeHandler()
+      }
+
+      //end notes
+
+      var loadApp = function() {
+        loadNoteStore()
+        newNoteClickHandler()
+        removeNoteClickHandler()
+        $('.new-note, .remove-note').removeClass('hide')
+      }
+    
+      var changeListener = function(datastore) {
+        datastore.recordsChanged.addListener(function(event) {
+          affectedNotes = event.affectedRecordsForTable('notes')
+          $.each(affectedNotes, function(i, note) {
+            if (note.isDeleted()) {
+              id = note.getId()
+              $('.canvas').empty()
+              $('.notes #' + id).remove()
+            } else {
+              var id = note.getId()
+              var title = note.get('title')
+              var body = note.get('body')
+              if (title == '') { loadNotes([note]) }
+              $('#'+id).html(title)
+              $('input#'+id).val(title)
+              $('textarea#'+id).val(body)
+              }
+          })
+        })
+      }
+
+      var setup = function() {
+        window.windowWidth = $(window).width()
+        window.windowHeight = $(window).height()
+        window.textHeight = window.windowHeight - 100
+        $('.notes').css({height: window.windowHeight - 40})
+        $('.canvas').css({height: window.windowHeight - 40, width: window.windowWidth - 301})
+      }
+
+      var notAuthenticated = function(error) {
+        $('.auth').removeClass('hide')
+        if (typeof(error) != 'undefined') { throwError(error) }
+      }
+
+      $(function() {
+        window.client = new Dropbox.Client({key: 'znz3jip9v0sxfnb'})  
+        client.authenticate({interactive: false}, function(error) {
+          if (error) notAuthenticated(error)
+        })
+
+        if (client.isAuthenticated()) {
+          showSpinner()
+          setup()
+          loadApp()
+        } else {
+          notAuthenticated()  
+        }
+
+        $('.auth').on('click', function() {
+          client.authenticate()
+          return false
+        })
+      })
+    </script>
+  </head>
+
+  <body>
+    <div class='spinner'></div>
+
+    <div class='toolbar'>
+      <div class='buttons'>
+        <a href='#' class='btn btn-danger new-note hide'>New Note</a>
+        <a href='#' class='btn btn-danger remove-note hide'>Remove Note</a>
+      </div>
+      <div class='errors'></div>
+      <div class='authorize'>
+        <a href='#' class='btn btn-danger auth hide'>authenticate</a>
+      </div>
+      <div class='clear'></div>
+    </div>
+    
+    <div class='notes'></div>
+    <div class='canvas'></div>
+  </body>
+</html>
