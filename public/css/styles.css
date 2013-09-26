@@ -31,6 +31,12 @@ a {
   float: left;
 }
 
+.toolbar .errors, .toolbar .messages {
+  float: right;
+  color: #d2322d;
+  padding: 7px;
+}
+
 .notes {
   float: left;
   width: 300px;

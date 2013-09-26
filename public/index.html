@@ -118,7 +118,8 @@
               $('#'+id).html(title)
               $('input#'+id).val(title)
               $('textarea#'+id).val(body)
-              }
+            }
+            $('.messages').show().text('saved').delay(1000).fadeOut('slow')
           })
         })
       }
@@ -168,6 +169,7 @@
         <a href='#' class='btn btn-danger remove-note hide'>Remove Note</a>
       </div>
       <div class='errors'></div>
+      <div class='messages'></div>
       <div class='authorize'>
         <a href='#' class='btn btn-danger auth hide'>authenticate</a>
       </div>
