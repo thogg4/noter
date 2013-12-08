@@ -38,16 +38,14 @@ a {
 }
 
 .notes {
-  float: left;
-  width: 300px;
   list-style-type: none;
 }
 .notes li {
   font-size: 16px;
   padding: 10px;
   border-bottom: 1px solid #E5E5E5;
-  overflow: hidden;
   cursor: pointer;
+  width: 100%;
 }
 .notes li.selected {
   color: #FFFFFF;
@@ -57,6 +55,7 @@ a {
 .canvas {
   float: left;
   border-left: 1px solid #DCDCDC;
+  width: 100%;
 }
 .canvas .welcome-message {
   width: 400px;
@@ -71,10 +70,14 @@ a {
 .canvas input, .canvas textarea {
   font-size: 15px;
   color: #000000;
-  width: 99%;
+  width: 100%;
+  height: 100%;
   border: none;
   box-shadow: none;
   padding: 2px 5px;
-  margin: 0px; }
+  margin: 0px;
+}
+.canvas textarea { min-height: 600px; }
+.canvas input { border-top: 0px solid #E5E5E5; }
 .canvas input:focus, .canvas textarea:focus {
   outline: none; }
